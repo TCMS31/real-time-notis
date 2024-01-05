@@ -1,0 +1,60 @@
+<% content_for :title, "Dashboard · Real-time Notis" %>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <header class="app-page-header">
+      <h1>Send a notification</h1>
+      <p>
+        Messages are picked from a server-side catalogue and delivered off the
+        request thread, so nothing here waits on the SMS provider.
+      </p>
+    </header>
+
+    <section class="app-card" aria-labelledby="recipient-heading">
+      <h2 id="recipient-heading" class="app-card-title">Recipient</h2>
+      <dl class="app-meta">
+        <div>
+          <dt>Name</dt>
+          <dd><%= current_user.name %></dd>
+        </div>
+        <div>
+          <dt>Number</dt>
+          <dd><%= current_user.masked_phone_number %></dd>
+        </div>
+        <div>
+          <dt>Delivery</dt>
+          <dd>
+            <span class="app-pill"><%= Sms::Deliverer.configured_adapter_name %> adapter</span>
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="app-card" aria-labelledby="messages-heading">
+      <h2 id="messages-heading" class="app-card-title">Available messages</h2>
+
+      <% if @message_keys.empty? %>
+        <p class="app-empty">No messages are enabled in the catalogue.</p>
+      <% else %>
+        <ul class="app-message-list">
+          <% @message_keys.each do |key| %>
+            <li class="app-message">
+              <div class="app-message-copy">
+                <p class="app-message-label"><%= Sms::MessageCatalog.label_for(key) %></p>
+                <p class="app-message-preview">
+                  &ldquo;<%= Sms::MessageCatalog.render(key, name: current_user.name) %>&rdquo;
+                </p>
+              </div>
+              <%# params:, not a query string: the key belongs in the request %>
+              <%# body, and it keeps per-form CSRF tokens bound to a stable URL. %>
+              <%= button_to "Send", messages_path,
+                            method: :post,
+                            params: { message_key: key },
+                            class: "btn btn-primary app-send" %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </section>
+  </div>
+</div>

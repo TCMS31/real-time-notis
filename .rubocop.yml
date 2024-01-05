@@ -1,0 +1,33 @@
+# Rails' own style guide (rubocop-rails-omakase): formatting stays out of the
+# way, the Rails-specific correctness cops stay on.
+inherit_gem:
+  rubocop-rails-omakase: rubocop.yml
+
+AllCops:
+  TargetRubyVersion: 3.2
+  NewCops: enable
+  Exclude:
+    - "bin/**/*"
+    - "db/schema.rb"
+    - "vendor/**/*"
+    - "node_modules/**/*"
+    - "tmp/**/*"
+    - "coverage/**/*"
+
+# Every file in app/, config/, lib/ and spec/ is frozen-string-literal.
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  Exclude:
+    - "db/**/*"
+    - "config/environments/*"
+    - "config/initializers/*"
+    - "config/boot.rb"
+    - "config/environment.rb"
+    - "config/puma.rb"
+    - "config/routes.rb"
+
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - "spec/**/*"
+    - "db/migrate/**/*"
