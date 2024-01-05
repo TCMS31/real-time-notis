@@ -16,6 +16,9 @@ gem "stimulus-rails"
 gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
 
+# Action Cable's production adapter (config/cable.yml).
+gem "redis", "~> 5.4"
+
 gem "devise"
 gem "twilio-ruby"
 

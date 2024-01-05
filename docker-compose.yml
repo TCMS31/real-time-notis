@@ -1,5 +1,7 @@
 name: real-time-notis
 
+# Local production-mode stack: Rails + PostgreSQL + Redis. Copy .env.example
+# to .env and fill in SECRET_KEY_BASE first (see the README).
 services:
   db:
     image: postgres:16-alpine
@@ -16,26 +18,40 @@ services:
       retries: 10
     restart: unless-stopped
 
+  # Action Cable's pub/sub backend in production.
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
   web:
     build:
       context: .
     environment:
       DATABASE_URL: postgres://real_time_notis:${POSTGRES_PASSWORD:-development-only}@db:5432/real_time_notis_production
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
-      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-}
-      RAILS_LOG_TO_STDOUT: "1"
-      RAILS_SERVE_STATIC_FILES: "1"
+      REDIS_URL: redis://redis:6379/1
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:?copy .env.example to .env and set SECRET_KEY_BASE}
+      # Plain HTTP on localhost. Leave it unset behind a TLS-terminating proxy.
+      FORCE_SSL: ${FORCE_SSL:-false}
       # Leave the TWILIO_* vars unset to run against the log adapter.
       TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
       TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
       TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
       SMS_ADAPTER: ${SMS_ADAPTER:-}
       QUEUE_ADAPTER: ${QUEUE_ADAPTER:-async}
+      # Puma otherwise forks one worker per host CPU.
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
     ports:
       # Host 8860 -> container 3000.
       - "${WEB_PORT:-8860}:3000"
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     restart: unless-stopped
 

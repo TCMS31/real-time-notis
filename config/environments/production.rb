@@ -49,7 +49,12 @@ Rails.application.configure do
   # config.assume_ssl = true
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  # FORCE_SSL=false is for the local Compose stack, which serves plain HTTP on
+  # localhost; with SSL forced there every page redirects to an https:// URL
+  # nothing is listening on.
+  config.force_ssl = ENV.fetch("FORCE_SSL", "true") != "false"
+  # The container healthcheck calls /up over plain HTTP from inside the container.
+  config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
   # Log to STDOUT by default
   config.logger = ActiveSupport::Logger.new(STDOUT)

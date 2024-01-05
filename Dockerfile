@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1
 
-# Keep in step with .ruby-version and the `ruby` line in the Gemfile.
+# Keep in step with .ruby-version, which the Gemfile reads.
 ARG RUBY_VERSION=3.4.12
 
 FROM ruby:$RUBY_VERSION-slim AS base
@@ -10,7 +10,7 @@ WORKDIR /rails
 ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
+    BUNDLE_WITHOUT="development:test"
 
 
 # ---- build stage: compilers and headers stay out of the final image --------
@@ -20,7 +20,7 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential git libpq-dev pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
-COPY Gemfile Gemfile.lock ./
+COPY Gemfile Gemfile.lock .ruby-version ./
 RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
