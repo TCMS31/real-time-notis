@@ -2,26 +2,57 @@
  * Application styles.
  *
  * Bootstrap 5 supplies the grid, buttons and alerts; everything below is the
- * small amount of product styling layered on top of it.
+ * small amount of product styling layered on top of it. The look borrows from
+ * a phone's message thread: dark teal chrome, warm paper, one signal-orange
+ * accent, and monospace for numbers and message bodies.
  *
  *= require_tree .
  *= require_self
  */
 
 :root {
-  --app-ink: #111827;
-  --app-muted: #6b7280;
-  --app-line: #e5e7eb;
-  --app-surface: #ffffff;
-  --app-ground: #f6f7f9;
-  --app-brand: #1f2937;
-  --app-accent: #2563eb;
+  --app-ink: #17201f;
+  --app-muted: #5b6563;
+  --app-line: #e4dfd5;
+  --app-surface: #fffdf9;
+  --app-ground: #f4f1ea;
+  --app-brand: #12302f;
+  --app-accent: #c2410c;
+  --app-accent-strong: #9a3412;
+  --app-bubble: #e9f1ef;
+  --app-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --app-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 
 .app-body {
   min-height: 100vh;
   background: var(--app-ground);
   color: var(--app-ink);
+  font-family: var(--app-sans);
+}
+
+/* Bootstrap's primary button and focus ring, in the app's accent. */
+.btn-primary {
+  --bs-btn-bg: var(--app-accent);
+  --bs-btn-border-color: var(--app-accent);
+  --bs-btn-hover-bg: var(--app-accent-strong);
+  --bs-btn-hover-border-color: var(--app-accent-strong);
+  --bs-btn-active-bg: var(--app-accent-strong);
+  --bs-btn-active-border-color: var(--app-accent-strong);
+  --bs-btn-disabled-bg: var(--app-accent);
+  --bs-btn-disabled-border-color: var(--app-accent);
+  font-weight: 600;
+}
+
+.form-control:focus,
+.form-check-input:focus {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 0.2rem rgba(194, 65, 12, 0.2);
+}
+
+.form-check-input:checked {
+  background-color: var(--app-accent);
+  border-color: var(--app-accent);
 }
 
 /* Navbar ------------------------------------------------------------------ */
@@ -52,8 +83,9 @@
   height: 2rem;
   border-radius: 0.5rem;
   background: var(--app-accent);
+  font-family: var(--app-mono);
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .app-identity {
@@ -70,9 +102,9 @@
 }
 
 .app-identity-phone {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.75);
+  font-family: var(--app-mono);
   font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
 }
 
 /* Page -------------------------------------------------------------------- */
@@ -127,15 +159,20 @@
 .app-meta dd {
   margin: 0;
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
+}
+
+.app-number {
+  font-family: var(--app-mono);
+  font-weight: 500;
 }
 
 .app-pill {
   display: inline-block;
   padding: 0.15rem 0.55rem;
   border-radius: 999px;
-  background: #eef2ff;
-  color: #3730a3;
+  background: #fde6d8;
+  color: var(--app-accent-strong);
+  font-family: var(--app-sans);
   font-size: 0.75rem;
   font-weight: 600;
 }
@@ -171,14 +208,33 @@
   font-weight: 600;
 }
 
+/* Rendered like an incoming text, so the user sees what will arrive. */
 .app-message-preview {
-  margin: 0;
-  color: var(--app-muted);
-  font-size: 0.875rem;
+  display: inline-block;
+  margin: 0.25rem 0 0;
+  padding: 0.45rem 0.75rem;
+  border-radius: 1rem 1rem 1rem 0.25rem;
+  background: var(--app-bubble);
+  color: var(--app-ink);
+  font-family: var(--app-mono);
+  font-size: 0.8rem;
 }
 
 .app-send {
   flex: none;
+}
+
+@media (max-width: 575.98px) {
+  .app-message {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .app-message form,
+  .app-send {
+    width: 100%;
+  }
 }
 
 .app-empty {
@@ -222,7 +278,7 @@
 }
 
 .app-auth-links a {
-  color: var(--app-accent);
+  color: var(--app-accent-strong);
 }
 
 #error_explanation {
