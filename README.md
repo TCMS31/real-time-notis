@@ -1,23 +1,24 @@
 # Real-time Notis
 
-A small Rails 7.1 app that sends transactional SMS to the signed-in user.
+A small Rails 8.1 app that sends transactional SMS to the signed-in user.
 People register with a phone number, get a welcome text, and can trigger one
 of a fixed set of messages from a single dashboard. Twilio delivers them —
 but with no Twilio credentials configured the app falls back to a log
 adapter, so the whole thing runs end to end on a laptop with no account and
 no spend.
 
-**A note on the name.** There is no WebSocket, Action Cable or browser-push
-layer in this repository. `app/channels/` holds the two unmodified classes
-`rails new` generates and `config/cable.yml` is stock. "Real-time" here means
-a text message goes out the moment an event happens, not that the browser
-gets pushed to. If you came looking for a broadcast pipeline, it is not here.
+**A note on the name.** "Real-time" here means a text message goes out the
+moment an event happens, not that the browser gets pushed to. Action Cable is
+mounted at `/cable` and only accepts signed-in users (Redis backs it in
+production), but no channel is defined and nothing is broadcast yet. If you
+came looking for a browser push pipeline, it is not here.
 
 ## The one screen
 
 Everything a signed-in user can do fits on one page: see which number the
-message will go to, and press one of two buttons. The "log adapter" pill is
-the app telling you no Twilio credentials are configured.
+message will go to, and press one of two buttons. Each message is previewed
+as the text that will arrive. The "log adapter" pill is the app telling you
+no Twilio credentials are configured.
 
 | Dashboard | After pressing Send |
 | --- | --- |
@@ -30,9 +31,16 @@ row is written:
 | --- | --- |
 | ![Sign-up](docs/screenshots/01-sign-up.png) | ![Validation error](docs/screenshots/04-validation-error.png) |
 
-All four were captured at 1440×900 against the app running locally on the log
-adapter. Request transcripts, the latency measurement and the test output are
-in [docs/captured-output.md](docs/captured-output.md).
+On a phone each message stacks above a full-width Send button:
+
+| Dashboard, 390×844 | After pressing Send, 390×844 |
+| --- | --- |
+| ![Dashboard on a phone](docs/screenshots/02-dashboard-mobile.png) | ![Message queued on a phone](docs/screenshots/03-message-queued-mobile.png) |
+
+All six were captured with Playwright against the Docker Compose stack on the
+log adapter, signed in as the seeded demo account. Request transcripts, the
+latency measurement and the test output are in
+[docs/captured-output.md](docs/captured-output.md).
 
 ## From button press to text message
 
@@ -73,31 +81,46 @@ is durably committed.
 
 ## Running it without a Twilio account
 
-Requires Ruby 3.2.2 and PostgreSQL.
+### With Docker Compose
+
+The stack is the production image plus PostgreSQL 16 and Redis 7. It needs
+nothing but Docker:
+
+```bash
+cp .env.example .env
+echo "SECRET_KEY_BASE=$(openssl rand -hex 64)" >> .env
+docker compose up --build        # http://localhost:8860
+```
+
+The first boot creates the database, runs the migrations and seeds a demo
+account. Sign in as `demo@example.com` / `correct horse battery`, or register
+a new one. With the `TWILIO_*` values left empty, messages go to the web
+container's log instead of a phone:
+
+```bash
+docker compose logs web | grep sms:log
+# [sms:log] to=+14••••••671 body="Hey Ada Lovelace, your transaction has been delivered!"
+```
+
+Compose sets `FORCE_SSL=false` so the app answers on plain
+`http://localhost`. Behind a TLS-terminating proxy, leave it unset and SSL is
+forced as usual. `docker compose down -v` removes the stack and its data.
+
+### Without Docker
+
+Requires Ruby 3.4.12 (see `.ruby-version`) and a local PostgreSQL.
 
 ```bash
 bundle install
-bin/rails db:prepare db:seed
+bin/rails db:prepare
 bin/rails server
 ```
 
-Open <http://localhost:3000> and sign in as `demo@example.com` /
-`correct horse battery`, or register a new account. With no `TWILIO_*`
-variables set, messages land in `log/development.log` instead of a phone:
+Open <http://localhost:3000>. Development uses the in-process async adapter
+for Action Cable, so Redis is not needed. Messages land in
+`log/development.log`.
 
-```
-[sms:log] to=+14••••••671 body="Hey Ada Lovelace, your transaction has been delivered!"
-```
-
-Set the three `TWILIO_*` variables to send for real. With Docker:
-
-```bash
-docker compose up --build   # http://localhost:8860
-```
-
-The compose file and `Dockerfile` are committed and `docker compose config`
-parses, but the image has not been built or booted here — treat it as
-unverified.
+Fill in the three `TWILIO_*` variables to send for real.
 
 ## When the provider is slow or down
 
@@ -168,18 +191,21 @@ renders as `+14••••••671` in the UI, in flash messages and in log li
 
 ## Environment variables
 
-Every one is optional. The app boots and works with none of them set.
+Outside production every one is optional, and the app boots and works with
+none of them set. `.env.example` lists the ones Compose reads.
 
 | Name | Required | Default | Purpose |
 | --- | --- | --- | --- |
+| `SECRET_KEY_BASE` | Production and Compose | — | Session and cookie signing. Compose refuses to start without it. |
 | `DATABASE_URL` | No | from `config/database.yml` | PostgreSQL connection. Overrides the YAML when set. |
+| `REDIS_URL` | Production | `redis://localhost:6379/1` | Action Cable pub/sub. Compose points it at its `redis` service. |
+| `FORCE_SSL` | No | `true` in production | `false` serves plain HTTP. Compose sets it to `false`. |
 | `TWILIO_ACCOUNT_SID` | For real SMS | credentials `twilio.account_sid` | Twilio account SID. |
 | `TWILIO_AUTH_TOKEN` | For real SMS | credentials `twilio.auth_token` | Twilio auth token. |
 | `TWILIO_FROM_NUMBER` | For real SMS | credentials `twilio.from_number` | Sending number, E.164. |
 | `SMS_ADAPTER` | No | `twilio` if all three above are set, else `log` | Forces an adapter by name. |
 | `QUEUE_ADAPTER` | No | `async` | Active Job backend. `async` is in-process — use a durable one in production. |
-| `RAILS_MASTER_KEY` | Production only | — | Decrypts `config/credentials.yml.enc`. Not needed if you use the `TWILIO_*` variables. |
-| `SECRET_KEY_BASE` | Production only | — | Session and cookie signing. Required if `RAILS_MASTER_KEY` is absent. |
+| `WEB_CONCURRENCY` | No | CPU count; `2` in Compose | Puma worker processes in production. |
 | `DEVISE_SECRET_KEY` | No | `secret_key_base` | Overrides Devise's token secret. |
 | `DEVISE_PEPPER` | No | none | Password pepper. Changing it invalidates existing passwords. |
 | `MAILER_SENDER` | No | `no-reply@example.com` | `From:` on Devise emails. |
@@ -190,7 +216,7 @@ Every one is optional. The app boots and works with none of them set.
 ## Working on the code
 
 ```bash
-bundle exec rspec       # 57 examples
+bundle exec rspec       # 60 examples
 bundle exec rubocop     # rubocop-rails-omakase
 bin/rails db:seed       # idempotent demo account
 ```
@@ -205,29 +231,35 @@ The SMS layer lives in `app/services/sms/`: `deliverer.rb` is the port and
 the named adapter registry, `message_catalog.rb` holds every sendable message
 and who may trigger it, `twilio_adapter.rb` and `log_adapter.rb` are the two
 implementations, and `result.rb` is the value object they return.
-`app/jobs/send_sms_job.rb` is the only caller of an adapter. `test/` is a
-vestigial Minitest tree that runs zero tests — RSpec is the real suite.
-
-`json` is pinned to the 2.x line in the `Gemfile`, with a comment explaining
-why: Rails 7.1's `ActiveSupport::JSON::Encoding` calls
-`JSON.generate(..., quirks_mode: true)`, a keyword json 3 removed, and
-RuboCop's `json >= 2.3` dependency is enough to resolve json 3 without the pin.
+`app/jobs/send_sms_job.rb` is the only caller of an adapter.
+`app/channels/application_cable/connection.rb` identifies each socket by the
+Devise user and rejects anonymous ones, so a future channel can scope its
+streams to `current_user`. `test/` holds only the Minitest helpers `rails new`
+generated; RSpec is the real suite.
 
 ## What this does not do
 
-- **No WebSocket, Action Cable or browser push**, despite the name.
+- **No Action Cable channels or browser push**, despite the name. The
+  connection layer is authenticated, but nothing subscribes or broadcasts.
 - **No delivery confirmation.** The dashboard says *queued*, not delivered.
   Twilio status callbacks are not implemented.
 - **No delivery record at all.** Nothing is written to the database when a
   message is sent, so there is no history, no audit trail and no idempotency
   key — a retried job sends the message a second time.
 - **`QUEUE_ADAPTER=async` loses queued messages on restart.** It is an
-  in-process thread pool with no persistence.
+  in-process thread pool with no persistence. That includes the demo
+  account's welcome text, which is enqueued during the first-boot seed by a
+  process that exits straight away.
 - **No rate limiting.** The allow-list caps *what* can be sent, not how
   often. A real deployment needs a per-user throttle.
 - **Phone numbers are never verified.** Anyone can register with someone
   else's number and cause a text to be sent to it.
-- **`config/credentials.yml.enc` is committed without its master key**, so it
-  cannot be decrypted. The `TWILIO_*` variables exist partly because of that.
+- **No encrypted credentials file is shipped.** `Sms::TwilioAdapter` still
+  falls back to `twilio.*` in Rails credentials if you add your own, but the
+  `TWILIO_*` variables are the supported path.
 - **One dashboard, two messages.** The catalogue is a frozen constant, so
   changing the copy means a deploy.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).
