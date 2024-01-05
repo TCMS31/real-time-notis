@@ -11,7 +11,7 @@ Bundler.require(*Rails.groups)
 module RealTimeNotis
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.1
+    config.load_defaults 8.1
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
@@ -24,6 +24,10 @@ module RealTimeNotis
     # in config/environments, which are processed later.
     #
     config.time_zone = "UTC"
+
+    # Nothing here stores images, so there is no image_processing gem to back
+    # the 8.x default variant processor.
+    config.active_storage.variant_processor = :disabled
 
     # Active Job runs on the in-process async adapter by default, which is
     # enough for this app's volume. Point QUEUE_ADAPTER at a durable backend

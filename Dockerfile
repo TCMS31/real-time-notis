@@ -1,9 +1,9 @@
 # syntax = docker/dockerfile:1
 
 # Keep in step with .ruby-version and the `ruby` line in the Gemfile.
-ARG RUBY_VERSION=3.2.2
+ARG RUBY_VERSION=3.4.12
 
-FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim AS base
+FROM ruby:$RUBY_VERSION-slim AS base
 
 WORKDIR /rails
 

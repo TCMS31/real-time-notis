@@ -2,9 +2,9 @@
 
 source "https://rubygems.org"
 
-ruby "3.2.2"
+ruby file: ".ruby-version"
 
-gem "rails", "~> 7.1.1"
+gem "rails", "~> 8.1.4"
 
 # Asset pipeline and front end. No bundler/transpiler: the UI is server
 # rendered with a handful of import-mapped modules.
@@ -15,15 +15,6 @@ gem "stimulus-rails"
 
 gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
-
-# Rails 7.1 is not compatible with the json 3.x series: both
-# ActiveSupport::JSON::Encoding and rack-session 2.0 call
-# JSON.generate(..., quirks_mode: true), a keyword json 3 removed. Nothing
-# in the app requires json directly, but RuboCop depends on `json >= 2.3`,
-# so without this pin adding the linter resolves json 3 and every request --
-# and every `to_json` -- raises ArgumentError: unknown keyword: quirks_mode.
-# Ruby 3.2 ships 2.6.3 as a default gem; this just keeps the resolver there.
-gem "json", "~> 2.6"
 
 gem "devise"
 gem "twilio-ruby"
