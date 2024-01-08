@@ -4,11 +4,10 @@ class LandingsController < ApplicationController
   def index; end
 
   def create
-    @msg = params[:msg]
-    response = Twilio::SendSmsService.new(current_user.phone_number, @msg, current_user.name).send_msg
+    response = Twilio::SendSmsService.new(current_user.phone_number, params[:msg], current_user.name).send_msg
 
     if response.fetch(:status)
-      flash[:notice] = @msg
+      flash[:notice] = params[:msg]
     else
       flash[:alert] = response.fetch(:msg)
     end
