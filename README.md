@@ -4,6 +4,8 @@ This project constitutes a basic web application constructed utilizing Ruby on R
 
 Within this application, users can register by providing their phone numbers to receive SMS notifications based on specific triggers. Upon signup, users receive an initial SMS notification. Additionally, when users press two designated buttons on the homepage, the application triggers the sending of SMS messages containing different content. The integration of Twilio API facilitates the transmission of these SMS messages.
 
+<img height="500" src="https://private-user-images.githubusercontent.com/119432487/294849787-97024631-254b-4b8d-8f70-708f07661b29.jpeg" >
+
 # Features
 
 - devise gem for authentication with additional attribute name and phone number.
