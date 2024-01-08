@@ -62,3 +62,9 @@ twilio:
    rails s
    visit the url localhost:3000
    ```
+4. **Rspecs**:
+
+   To run Rspec please run the following command:
+   ```bash
+   rspec
+   ```
