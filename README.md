@@ -43,6 +43,7 @@ Within this application, users can register by providing their phone numbers to 
 2. **Initialize the Database**:
    - Before starting the application for the first time, ensure that the database is set up correctly.
    ```bash
+   bundle install
    rails db:create db:migrate
    ```
    - Now run the application with
