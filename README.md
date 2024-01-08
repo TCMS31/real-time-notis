@@ -6,7 +6,7 @@ Within this application, users can register by providing their phone numbers to 
 
 **Demo**
 
-[https://www.loom.com/share/7d2d60f3f7da41da9cb96d2733a49dd7]
+[https://www.loom.com/share/fd5f927058f348c481ce9dc8a2872045]
 
 <img height="500" src="https://github.com/Chsaleem31/real-time-notis/assets/119432487/df88d5cd-afc2-4d9b-9cfd-f80b9219024b" >
 
