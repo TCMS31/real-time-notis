@@ -26,21 +26,32 @@ Within this application, users can register by providing their phone numbers to 
 
 ## Prerequisites
 
-
-  ```bash
-  brew install postgresql
-  \curl -sSL https://get.rvm.io | bash -s stable
-  rvm i 3.2.2
-  ```
+```bash
+brew install postgresql
+\curl -sSL https://get.rvm.io | bash -s stable
+rvm i 3.2.2
+```
 
 ## Installation
 
 1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/Chsaleem31/real-time-notis.git
-   ```
 
-2. **Initialize the Database**:
+```bash
+git clone https://github.com/Chsaleem31/real-time-notis.git
+```
+
+2.  **Edit credentials file**:
+
+```bash
+EDITOR=vim rails credentials:edit
+```
+```
+twilio:
+   account_sid: your account sid
+   auth_token: auth token
+```
+
+3. **Initialize the Database**:
    - Before starting the application for the first time, ensure that the database is set up correctly.
    ```bash
    bundle install
@@ -51,4 +62,3 @@ Within this application, users can register by providing their phone numbers to 
    rails s
    visit the url localhost:3000
    ```
-

@@ -3,7 +3,7 @@ class LandingsController < ApplicationController
 
   def index; end
 
-  def send_alert
+  def create
     @msg = params[:msg]
     response = Twilio::SendSmsService.new(current_user.phone_number, @msg, current_user.name).send_msg
 

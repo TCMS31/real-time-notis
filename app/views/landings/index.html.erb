@@ -1,4 +1,4 @@
 <div class="container d-flex justify-content-center align-items-center w-full h-50">
-  <%= button_to "send transaction success sms", send_alert_landings_path(msg: TRANSACTION_SUCCESS), class: 'btn btn-primary mx-2', method: :post %>
-  <%= button_to "send transaction decline sms", send_alert_landings_path(msg: TRANSACTION_DECLINED), class: 'btn btn-outline-dark mx-2', method: :post %>
+  <%= button_to "send transaction success sms", landings_path(msg: TRANSACTION_SUCCESS), class: 'btn btn-primary mx-2', method: :post %>
+  <%= button_to "send transaction decline sms", landings_path(msg: TRANSACTION_DECLINED), class: 'btn btn-outline-dark mx-2', method: :post %>
 </div>
