@@ -1,0 +1,24 @@
+<nav class="navbar navbar-expand-lg app-navbar">
+  <div class="container">
+    <%= link_to root_path, class: "navbar-brand app-brand" do %>
+      <span class="app-brand-mark" aria-hidden="true">RN</span>
+      <span>Real-time Notis</span>
+    <% end %>
+
+    <% if user_signed_in? %>
+      <div class="d-flex align-items-center gap-3">
+        <span class="app-identity d-none d-sm-inline">
+          <span class="app-identity-name"><%= current_user.name %></span>
+          <span class="app-identity-phone"><%= current_user.masked_phone_number %></span>
+        </span>
+        <%= button_to "Sign out", destroy_user_session_path,
+                      method: :delete, class: "btn btn-sm btn-outline-light" %>
+      </div>
+    <% else %>
+      <div class="d-flex gap-2">
+        <%= link_to "Log in", new_user_session_path, class: "btn btn-sm btn-outline-light" %>
+        <%= link_to "Sign up", new_user_registration_path, class: "btn btn-sm btn-light" %>
+      </div>
+    <% end %>
+  </div>
+</nav>
