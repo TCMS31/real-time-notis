@@ -1,0 +1,257 @@
+/*
+ * Application styles.
+ *
+ * Bootstrap 5 supplies the grid, buttons and alerts; everything below is the
+ * small amount of product styling layered on top of it.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
+:root {
+  --app-ink: #111827;
+  --app-muted: #6b7280;
+  --app-line: #e5e7eb;
+  --app-surface: #ffffff;
+  --app-ground: #f6f7f9;
+  --app-brand: #1f2937;
+  --app-accent: #2563eb;
+}
+
+.app-body {
+  min-height: 100vh;
+  background: var(--app-ground);
+  color: var(--app-ink);
+}
+
+/* Navbar ------------------------------------------------------------------ */
+
+.app-navbar {
+  background: var(--app-brand);
+  color: #fff;
+}
+
+.app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.app-brand:hover,
+.app-brand:focus {
+  color: #fff;
+}
+
+.app-brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: var(--app-accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.app-identity {
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 1.2;
+  text-align: right;
+}
+
+.app-identity-name {
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.app-identity-phone {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Page -------------------------------------------------------------------- */
+
+.app-page-header {
+  margin-bottom: 1.25rem;
+}
+
+.app-page-header h1 {
+  font-size: 1.6rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.35rem;
+}
+
+.app-page-header p {
+  color: var(--app-muted);
+  margin-bottom: 0;
+  max-width: 54ch;
+}
+
+.app-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-line);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.35rem;
+  margin-bottom: 1rem;
+}
+
+.app-card-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--app-muted);
+  margin-bottom: 0.9rem;
+}
+
+.app-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 0;
+}
+
+.app-meta dt {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--app-muted);
+}
+
+.app-meta dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.app-pill {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Message list ------------------------------------------------------------ */
+
+.app-message-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.app-message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--app-line);
+}
+
+.app-message:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.app-message-copy {
+  min-width: 0;
+}
+
+.app-message-label {
+  margin: 0 0 0.15rem;
+  font-weight: 600;
+}
+
+.app-message-preview {
+  margin: 0;
+  color: var(--app-muted);
+  font-size: 0.875rem;
+}
+
+.app-send {
+  flex: none;
+}
+
+.app-empty {
+  color: var(--app-muted);
+  margin: 0;
+}
+
+/* Flash ------------------------------------------------------------------- */
+
+.app-flash {
+  border-radius: 0.6rem;
+}
+
+/* Auth forms -------------------------------------------------------------- */
+
+.app-auth {
+  max-width: 26rem;
+  margin: 2rem auto;
+}
+
+.app-auth h1 {
+  font-size: 1.4rem;
+  font-weight: 650;
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.app-auth .app-card {
+  margin-bottom: 1rem;
+}
+
+.app-auth .form-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--app-muted);
+}
+
+.app-auth-links {
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.app-auth-links a {
+  color: var(--app-accent);
+}
+
+#error_explanation {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  border-radius: 0.6rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+}
+
+#error_explanation h2 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #991b1b;
+  margin-bottom: 0.4rem;
+}
+
+#error_explanation ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: #991b1b;
+  font-size: 0.875rem;
+}
+
+/* Focus ------------------------------------------------------------------- */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--app-accent);
+  outline-offset: 2px;
+}
