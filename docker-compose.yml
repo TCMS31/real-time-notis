@@ -1,0 +1,43 @@
+name: real-time-notis
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: real_time_notis
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-development-only}
+      POSTGRES_DB: real_time_notis_production
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U real_time_notis -d real_time_notis_production"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+    environment:
+      DATABASE_URL: postgres://real_time_notis:${POSTGRES_PASSWORD:-development-only}@db:5432/real_time_notis_production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-}
+      RAILS_LOG_TO_STDOUT: "1"
+      RAILS_SERVE_STATIC_FILES: "1"
+      # Leave the TWILIO_* vars unset to run against the log adapter.
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
+      SMS_ADAPTER: ${SMS_ADAPTER:-}
+      QUEUE_ADAPTER: ${QUEUE_ADAPTER:-async}
+    ports:
+      # Host 8860 -> container 3000.
+      - "${WEB_PORT:-8860}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:

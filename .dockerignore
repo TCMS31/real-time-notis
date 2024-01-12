@@ -1,0 +1,40 @@
+# Version control and CI.
+/.git/
+/.github/
+
+# Bundler config (BUNDLE_* env vars are used in the image instead).
+/.bundle
+
+# Never ship secrets or local env files.
+/.env*
+!/.env*.erb
+/config/master.key
+/config/credentials/*.key
+
+# Logs, temp files and pids.
+/log/*
+!/log/.keep
+/tmp/*
+!/tmp/.keep
+/tmp/pids/*
+!/tmp/pids/.keep
+
+# Local storage and uploads.
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/.keep
+
+# Build and tooling output.
+/node_modules/
+/app/assets/builds/*
+!/app/assets/builds/.keep
+/public/assets
+/coverage
+
+# Not needed at runtime, and they invalidate the layer cache on every edit.
+/spec/
+/test/
+/docs/
+/.rubocop.yml
+/README.md
